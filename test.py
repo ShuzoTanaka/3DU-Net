@@ -6,7 +6,7 @@ from model import MultiClassModel  # モデル定義
 from dataModuleForTest import DataModuleForTest  # テスト用のデータモジュール
 
 # モデルとデータモジュールのインスタンス化
-model_path = r"C:\Users\orilab\Desktop\Tanaka\pytorchLightning\3d_1009\best-epoch=121-val_loss=0.15.ckpt"  # 学習時に保存された最良モデルのパス
+model_path = r"C:\Users\orilab\Desktop\Tanaka\pytorchLightning\3d_v5\best-epoch=182-val_loss=0.13.ckpt"  # v5: Dice only, 34症例, no seed（正式版）
 model = MultiClassModel.load_from_checkpoint(model_path)
 
 # データモジュールのインスタンス化

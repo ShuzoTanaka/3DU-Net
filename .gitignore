@@ -18,6 +18,7 @@ data4/
 data temp/
 temp0206/
 test_data/
+Dataset001_lumber/
 
 # ===== 学習済みモデル・チェックポイント =====
 *.ckpt
@@ -28,6 +29,11 @@ test_data/
 *.safetensors
 checkpoints/
 3d_1009/
+3d_combined/
+3d_finetune/
+3d_improved/
+3d_safe/
+3d_v5/
 temp_checkpoints/
 
 # ===== 学習ログ =====

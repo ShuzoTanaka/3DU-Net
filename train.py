@@ -40,7 +40,7 @@ if __name__ == "__main__":
     # チェックポイントコールバック
     checkpoint_callback = ModelCheckpoint(
         monitor="val_loss",  # モニター対象
-        dirpath="3d_1009",  # 保存先ディレクトリ
+        dirpath="3d_improved",  # 保存先ディレクトリ（改善版）
         filename="best-{epoch:02d}-{val_loss:.2f}",  # 保存ファイル名フォーマット
         save_top_k=1,  # 最良モデルのみ保存
         mode="min",  # 低い値が良い
