@@ -120,11 +120,8 @@ class MultiClassModel(L.LightningModule):
         all_dice = torch.stack([x["test_dice_score"] for x in self.test_outputs])
         mean_dice = all_dice.mean(dim=0)
 
-        class_names = ["背景(class 0)", "nerve(class 1)", "spinal(class 2)"]
-        for class_idx, dice in enumerate(mean_dice):
-            label = class_names[class_idx] if class_idx < len(class_names) else f"class {class_idx}"
-            print(f"{label} Dice: {dice.item():.4f}")
-
-        print(f"Overall Dice (class1+2 平均): {mean_dice[1:].mean().item():.4f}")
+        print(f"nerve(class 1)  Dice: {mean_dice[1].item():.4f}")
+        print(f"spinal(class 2) Dice: {mean_dice[2].item():.4f}")
+        print(f"Overall Dice (nerve+spinal 平均): {mean_dice[1:].mean().item():.4f}")
 
         self.test_outputs = []
