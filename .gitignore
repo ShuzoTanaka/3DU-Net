@@ -62,3 +62,12 @@ __pycache__/
 Thumbs.db
 
 test_predictions/
+
+# ===== 使い捨てスクリプト（動作確認・デバッグ用の一時ファイル） =====
+# 恒久的に使うコードは archive/ か通常のスクリプトとして残し、
+# 使い捨てのコードはリポジトリ直下に置かず、ここに載せて追跡対象から外す
+a.py
+temp.py
+test_.py
+scratch_*.py
+tmp_*.py

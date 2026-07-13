@@ -11,13 +11,12 @@ from model import MultiClassModel
 if __name__ == "__main__":
     torch.set_float32_matmul_precision("medium")
 
-    dataset_path = Path(
-        "C:/Users/orilab/Desktop/Tanaka/pytorchLightning/0206data/train_val"
-    )
+    base_dir = Path(__file__).resolve().parent
+    dataset_path = base_dir / "0206data" / "train_val"
     data_module = DataModule(dataset_path=dataset_path, batch_size=2)
 
     # 元の良いチェックポイントからウェイトをロード (lr=1e-4でファインチューニング)
-    old_ckpt = r"C:\Users\orilab\Desktop\Tanaka\pytorchLightning\3d_1009\best-epoch=121-val_loss=0.15.ckpt"
+    old_ckpt = base_dir / "3d_1009" / "best-epoch=121-val_loss=0.15.ckpt"
     model = MultiClassModel.load_from_checkpoint(
         old_ckpt,
         in_channels=1,

@@ -1,16 +1,20 @@
-# 3Dnifti用testコード　使える！！
+# 3D U-Net テストスクリプト（train_v4.pyで学習した最終モデル用、README記載のDice 0.678はこの結果）
 
-import torch
+from pathlib import Path
+
 from lightning.pytorch import Trainer
 from model import MultiClassModel  # モデル定義
 from dataModuleForTest import DataModuleForTest  # テスト用のデータモジュール
 
-# モデルとデータモジュールのインスタンス化
-model_path = r"C:\Users\orilab\Desktop\Tanaka\pytorchLightning\3d_v5\best-epoch=182-val_loss=0.13.ckpt"  # v5: Dice only, 34症例, no seed（正式版）
+BASE_DIR = Path(__file__).resolve().parent
+
+# 学習時のスクリプト名はtrain_v5.pyだったため（後にtrain_v4.pyへ改名）、
+# チェックポイントの保存先フォルダ名は3d_v5のまま残っている
+model_path = BASE_DIR / "3d_v5" / "best-epoch=182-val_loss=0.13.ckpt"
 model = MultiClassModel.load_from_checkpoint(model_path)
 
 # データモジュールのインスタンス化
-data_module = DataModuleForTest(dataset_path="0206nii", batch_size=2)
+data_module = DataModuleForTest(dataset_path=BASE_DIR / "0206nii", batch_size=2)
 
 # ここでセットアップを実行
 data_module.setup()

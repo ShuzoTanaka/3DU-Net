@@ -13,8 +13,9 @@ from model import MultiClassModel
 if __name__ == "__main__":
     torch.set_float32_matmul_precision("medium")
 
-    old_data_path = Path("C:/Users/orilab/Desktop/Tanaka/pytorchLightning/0206data/train_val")
-    new_data_path = Path("C:/Users/orilab/Desktop/Tanaka/pytorchLightning/Dataset001_lumber")
+    base_dir = Path(__file__).resolve().parent
+    old_data_path = base_dir / "0206data" / "train_val"
+    new_data_path = base_dir / "Dataset001_lumber"
 
     data_module = DataModuleSafe(
         old_data_path=old_data_path,

@@ -5,9 +5,11 @@ import segmentation_models_pytorch as smp
 from pathlib import Path
 from model_2D import MultiClassModel
 
+BASE_DIR = Path(__file__).resolve().parent
+
 # 3Dモデルと同じホールドアウト5症例でテスト（公平な比較）
-model_path = r"C:\Users\orilab\Desktop\Tanaka\pytorchLightning\3d_2D_v2\best-2D-epoch=94-val_loss=0.08.ckpt"
-test_data_path = Path(r"C:\Users\orilab\Desktop\Tanaka\pytorchLightning\0206nii")
+model_path = BASE_DIR / "3d_2D_v2" / "best-2D-epoch=94-val_loss=0.08.ckpt"
+test_data_path = BASE_DIR / "0206nii"
 
 model = MultiClassModel.load_from_checkpoint(model_path)
 model.eval()
