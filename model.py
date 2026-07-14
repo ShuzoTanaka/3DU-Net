@@ -71,6 +71,19 @@ class MultiClassModel(L.LightningModule):
         if not hasattr(self, "global_sample_idx"):
             self.global_sample_idx = 0
 
+        # Dice係数の計算 (argmaxによるクラスインデックスで正しく評価)
+        # サンプル単位で保持し、バッチ内で平均しない。
+        # バッチサイズが症例数を割り切らない場合(5症例をbatch_size=2で分けると2,2,1になる等)、
+        # バッチ平均を等重みでさらに平均すると症例ごとの重みが不均等になるため、
+        # on_test_epoch_end側で全症例をまとめて均等平均する
+        tp, fp, fn, tn = smp.metrics.get_stats(
+            pred_labels,    # [B, H, W, D] クラスインデックス
+            masks_labels,   # [B, H, W, D] クラスインデックス
+            mode="multiclass",
+            num_classes=predictions.shape[1],
+        )
+        dice_per_sample = smp.metrics.f1_score(tp, fp, fn, tn, reduction="none")  # [B, C]
+
         for i in range(predictions.shape[0]):
             sample_idx = self.global_sample_idx
             self.global_sample_idx += 1
@@ -96,32 +109,35 @@ class MultiClassModel(L.LightningModule):
                 nib.save(nib.Nifti1Image(pred_onehot[i, class_idx], np.eye(4)), pred_path)
                 print(f"Saved: {pred_path}")
 
-        # Dice係数の計算 (argmaxによるクラスインデックスで正しく評価)
-        tp, fp, fn, tn = smp.metrics.get_stats(
-            pred_labels,    # [B, H, W, D] クラスインデックス
-            masks_labels,   # [B, H, W, D] クラスインデックス
-            mode="multiclass",
-            num_classes=predictions.shape[1],
-        )
-        # クラスごとのDice [B, C] → バッチ平均 → [C]
-        dice_per_class = smp.metrics.f1_score(tp, fp, fn, tn, reduction="none").mean(dim=0)
+            self.test_outputs.append({"sample_idx": sample_idx, "test_dice_score": dice_per_sample[i]})
 
-        self.test_outputs.append({"test_dice_score": dice_per_class})
-        self.log("test_dice_score", dice_per_class.mean(), on_epoch=True)
+        self.log("test_dice_score", dice_per_sample.mean(), on_epoch=True)
 
-        return {"test_dice_score": dice_per_class}
+        return {"test_dice_score": dice_per_sample.mean(dim=0)}
 
     def on_test_epoch_end(self):
         if not self.test_outputs:
             print("Error: self.test_outputs is empty.")
             return
 
-        # [N_batches, C] → [C]
+        # [N_cases, C] → [C]  (症例ごとに1件、バッチサイズに関係なく全症例を均等平均)
         all_dice = torch.stack([x["test_dice_score"] for x in self.test_outputs])
         mean_dice = all_dice.mean(dim=0)
 
         print(f"nerve(class 1)  Dice: {mean_dice[1].item():.4f}")
         print(f"dural sac(class 2) Dice: {mean_dice[2].item():.4f}")
         print(f"Overall Dice (nerve+dural sac 平均): {mean_dice[1:].mean().item():.4f}")
+
+        # 参考: GTに硬膜管ラベルが1画素も存在しない症例を除いた場合。
+        # sample_idxは0206nii/images配下をファイル名ソートした順(00003,00006,00008,00010,00011)に対応し、
+        # 00008がindex=2にあたる
+        NO_DURAL_SAC_LABEL_SAMPLE_IDX = {2}
+        keep = [x["sample_idx"] not in NO_DURAL_SAC_LABEL_SAMPLE_IDX for x in self.test_outputs]
+        if not all(keep) and any(keep):
+            mean_dice_excl = all_dice[keep].mean(dim=0)
+            print(f"【参考】sample_idx={sorted(NO_DURAL_SAC_LABEL_SAMPLE_IDX)}(硬膜管ラベル無し症例)を除いた{sum(keep)}症例平均")
+            print(f"nerve(class 1)  Dice: {mean_dice_excl[1].item():.4f}")
+            print(f"dural sac(class 2) Dice: {mean_dice_excl[2].item():.4f}")
+            print(f"Overall Dice (nerve+dural sac 平均): {mean_dice_excl[1:].mean().item():.4f}")
 
         self.test_outputs = []

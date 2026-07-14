@@ -18,9 +18,14 @@ model.cuda()
 image_dir = test_data_path / "images"
 mask_dir = test_data_path / "masks"
 
+# GTに硬膜管(class 2)ラベルが1画素も存在しない症例。含めるとDiceが強制的に0になるため
+# 参考値として除外した集計も別途出す（詳細はREADMEの「2D vs 3D 比較実験」注記を参照）
+NO_DURAL_SAC_LABEL_CASES = {"00008"}
+
 image_files = sorted(image_dir.glob("*.nii"))
 print(f"テスト症例数: {len(image_files)}")
 
+case_ids = []
 case_dice_list = []
 
 for img_path in image_files:
@@ -63,11 +68,14 @@ for img_path in image_files:
     )  # [1, C]
 
     case_dice = smp.metrics.f1_score(tp, fp, fn, tn, reduction="none")[0]  # [C]
+    case_ids.append(base)
     case_dice_list.append(case_dice)
     print(f" → nerve={case_dice[1].item():.4f}, dural sac={case_dice[2].item():.4f}")
 
+all_dice = torch.stack(case_dice_list)  # [N, C]
+
 # 症例ごとのDiceを平均(3Dモデルと同じ「症例単位Diceの平均」で統一)
-mean_dice = torch.stack(case_dice_list).mean(dim=0)
+mean_dice = all_dice.mean(dim=0)
 
 print()
 print("=" * 45)
@@ -76,3 +84,14 @@ print(f"nerve(class 1)  Dice: {mean_dice[1].item():.4f}")
 print(f"dural sac(class 2) Dice: {mean_dice[2].item():.4f}")
 print(f"Overall Dice (nerve+dural sac 平均): {mean_dice[1:].mean().item():.4f}")
 print("=" * 45)
+
+# 参考: GTに硬膜管ラベルが無い症例を除いた場合
+keep_mask = [cid not in NO_DURAL_SAC_LABEL_CASES for cid in case_ids]
+if not all(keep_mask) and any(keep_mask):
+    mean_dice_excl = all_dice[keep_mask].mean(dim=0)
+    excluded = [cid for cid in case_ids if cid in NO_DURAL_SAC_LABEL_CASES]
+    print(f"【参考】{excluded}を除いた{sum(keep_mask)}症例平均")
+    print(f"nerve(class 1)  Dice: {mean_dice_excl[1].item():.4f}")
+    print(f"dural sac(class 2) Dice: {mean_dice_excl[2].item():.4f}")
+    print(f"Overall Dice (nerve+dural sac 平均): {mean_dice_excl[1:].mean().item():.4f}")
+    print("=" * 45)

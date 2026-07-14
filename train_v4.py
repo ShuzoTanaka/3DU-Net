@@ -9,7 +9,7 @@ from DataModuleSafe import DataModuleSafe
 from model import MultiClassModel
 
 # 最終版: Dice lossのみ・seed無し・安全34症例
-# 結果: nerve=0.6794, dural sac=0.6768, 平均=0.6781（0.68達成）
+# 結果 (test.pyの集計バグ修正後の正しい値): nerve=0.6798, dural sac=0.6518, 平均=0.6658
 if __name__ == "__main__":
     torch.set_float32_matmul_precision("medium")
 
