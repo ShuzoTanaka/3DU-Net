@@ -1,4 +1,5 @@
 import os
+from pathlib import Path
 import torch
 import numpy as np
 from PIL import Image
@@ -6,10 +7,12 @@ import nibabel as nib
 from torchvision import transforms
 from model_2D import MultiClassModel
 
+BASE_DIR = Path(__file__).resolve().parent.parent
+
 # ---- 設定 ----
-image_dir = "C:/Users/orilab/Desktop/Tanaka/pytorchLightning/test_data"  # 予測したい画像フォルダ
+image_dir = BASE_DIR / "test_data"  # 予測したい画像フォルダ
 output_dir = "inference_output"  # 出力フォルダ
-checkpoint_path = "C:/Users/orilab/Desktop/Tanaka/pytorchLightning/checkpoints/best-2D-2025-06-17_19-37-25-epoch=66-val_loss=0.10.ckpt"  # 実際のファイル名に置き換えてください
+checkpoint_path = BASE_DIR / "checkpoints" / "best-2D-2025-06-17_19-37-25-epoch=66-val_loss=0.10.ckpt"  # 実際のファイル名に置き換えてください
 num_classes = 3
 device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 

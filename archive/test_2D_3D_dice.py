@@ -1,4 +1,5 @@
 import os
+from pathlib import Path
 import torch
 import nibabel as nib
 import numpy as np
@@ -8,6 +9,8 @@ from dataset_2D import Nifti2DDataset
 from torch.utils.data import DataLoader
 import segmentation_models_pytorch as smp
 from PIL import Image
+
+BASE_DIR = Path(__file__).resolve().parent.parent
 
 
 def dice_coefficient(pred, target, eps=1e-6):
@@ -111,7 +114,7 @@ def calculate_dice_2d_and_3d(model, dataset_path, target_class=1, output_dir="re
 
 if __name__ == "__main__":
     # 学習済みモデル読み込み
-    model_path = r"C:\Users\orilab\Desktop\Tanaka\pytorchLightning\3d_1009\best-epoch=121-val_loss=0.15.ckpt"
+    model_path = BASE_DIR / "3d_1009" / "best-epoch=121-val_loss=0.15.ckpt"
     model = MultiClassModel.load_from_checkpoint(model_path)
     model.cuda().eval()
 

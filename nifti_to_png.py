@@ -1,7 +1,10 @@
 import os
+from pathlib import Path
 import nibabel as nib
 import numpy as np
 from PIL import Image
+
+BASE_DIR = Path(__file__).resolve().parent
 
 
 def convert_nifti_to_png(input_dir, output_dir, start_index=1, is_mask=False):
@@ -72,12 +75,12 @@ def convert_nifti_to_png(input_dir, output_dir, start_index=1, is_mask=False):
 
 def main():
     # 元のデータディレクトリ
-    base_dir = r"C:\Users\orilab\Desktop\Tanaka\pytorchLightning\data3"
+    base_dir = BASE_DIR / "data3"
     images_dir = os.path.join(base_dir, "images")
     masks_dir = os.path.join(base_dir, "masks")
 
     # 新しいデータディレクトリ
-    new_base_dir = r"C:\Users\orilab\Desktop\Tanaka\pytorchLightning\data4"
+    new_base_dir = BASE_DIR / "data4"
     new_images_dir = os.path.join(new_base_dir, "images")
     new_masks_dir = os.path.join(new_base_dir, "masks")
 

@@ -53,7 +53,7 @@ class DataModule(L.LightningDataModule):
 
 if __name__ == "__main__":
     # データモジュールの動作確認
-    dataset_path = r"C:\Users\orilab\Desktop\Tanaka\pytorchLightning\data2"
+    dataset_path = Path(__file__).resolve().parent.parent / "data2"
     batch_size = 4
 
     dm = DataModule(dataset_path, batch_size)

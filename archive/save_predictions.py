@@ -1,9 +1,12 @@
 import os
+from pathlib import Path
 import torch
 from model_2D import MultiClassModel  # 2D用のモデル定義
 from dataModule_2D import DataModule  # 2D用のデータモジュール
 import torch.nn.functional as F
 from PIL import Image
+
+BASE_DIR = Path(__file__).resolve().parent.parent
 
 def save_all_test_data_and_predictions(model, datamodule, output_dir="test_predictions"):
     """
@@ -54,7 +57,7 @@ def save_all_test_data_and_predictions(model, datamodule, output_dir="test_predi
 
 if __name__ == '__main__':
     # モデルとデータモジュールのインスタンス化
-    model_path = r"C:\Users\orilab\Desktop\Tanaka\pytorchLightning\checkpoints\best-epoch=45-val_loss=0.12.ckpt"
+    model_path = BASE_DIR / "checkpoints" / "best-epoch=45-val_loss=0.12.ckpt"
     model = MultiClassModel.load_from_checkpoint(model_path)
 
     # データモジュールのインスタンス化

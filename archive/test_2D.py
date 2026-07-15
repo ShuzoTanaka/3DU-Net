@@ -1,4 +1,5 @@
 import os
+from pathlib import Path
 import torch
 from lightning.pytorch import Trainer
 from model_2D import MultiClassModel  # 2D用のモデル定義
@@ -6,6 +7,8 @@ from dataModule_2D import DataModule  # 2D用のデータモジュール
 import segmentation_models_pytorch as smp
 import torch.nn.functional as F
 from PIL import Image
+
+BASE_DIR = Path(__file__).resolve().parent.parent
 
 
 def calculate_class_dice_score_and_save_samples(
@@ -83,7 +86,7 @@ def calculate_class_dice_score_and_save_samples(
 
 if __name__ == "__main__":
     # モデルとデータモジュールのインスタンス化
-    model_path = r"C:\Users\orilab\Desktop\Tanaka\pytorchLightning\checkpoints\best-epoch=45-val_loss=0.12.ckpt"
+    model_path = BASE_DIR / "checkpoints" / "best-epoch=45-val_loss=0.12.ckpt"
     model = MultiClassModel.load_from_checkpoint(model_path)
 
     # データモジュールのインスタンス化

@@ -1,4 +1,5 @@
 import os
+from pathlib import Path
 import torch
 import nibabel as nib
 import numpy as np
@@ -7,6 +8,8 @@ from lightning.pytorch import Trainer
 from model import MultiClassModel
 from dataModuleForTest import DataModuleForTest
 import pandas as pd
+
+BASE_DIR = Path(__file__).resolve().parent.parent
 
 
 def compute_dice_score(pred, target, threshold=0.5):
@@ -51,8 +54,8 @@ def compute_dice_scores_3D(pred_path, target_path):
 
 if __name__ == "__main__":
     # モデル・データ設定
-    model_path = r"C:\Users\orilab\Desktop\Tanaka\pytorchLightning\3d_1009\best-epoch=121-val_loss=0.15.ckpt"
-    dataset_path = r"C:\Users\orilab\Desktop\Tanaka\pytorchLightning\temp0206"
+    model_path = BASE_DIR / "3d_1009" / "best-epoch=121-val_loss=0.15.ckpt"
+    dataset_path = BASE_DIR / "temp0206"
     output_dir = "nifti_predictions0206_summary"
 
     os.makedirs(output_dir, exist_ok=True)

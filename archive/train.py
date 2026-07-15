@@ -15,8 +15,8 @@ if __name__ == "__main__":
     torch.set_float32_matmul_precision("medium")
 
     # データセットパス
-    dataset_path = Path(
-        "C:/Users/orilab/Desktop/Tanaka/pytorchLightning/0206data/train_val"
+    dataset_path = (
+        Path(__file__).resolve().parent.parent / "0206data" / "train_val"
     )  # "data/images" と "data/masks" が含まれるフォルダ
 
     # データモジュールの設定
